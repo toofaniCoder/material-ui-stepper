@@ -30,12 +30,17 @@ function getSteps() {
   ];
 }
 const BasicForm = () => {
-  const { control } = useFormContext();
+  const {
+    control,
+    formState: { errors },
+  } = useFormContext();
+  console.log(errors);
   return (
     <>
       <Controller
         control={control}
         name="firstName"
+        rules={{ required: "this field is required." }}
         render={({ field }) => (
           <TextField
             id="first-name"
@@ -45,6 +50,8 @@ const BasicForm = () => {
             fullWidth
             margin="normal"
             {...field}
+            error={Boolean(errors?.firstName)}
+            helperText={errors.firstName?.message}
           />
         )}
       />
@@ -52,6 +59,7 @@ const BasicForm = () => {
       <Controller
         control={control}
         name="lastName"
+        rules={{ required: "this field is required." }}
         render={({ field }) => (
           <TextField
             id="last-name"
@@ -61,6 +69,8 @@ const BasicForm = () => {
             fullWidth
             margin="normal"
             {...field}
+            error={Boolean(errors?.lastName)}
+            helperText={errors.lastName?.message}
           />
         )}
       />
@@ -68,6 +78,7 @@ const BasicForm = () => {
       <Controller
         control={control}
         name="nickName"
+        rules={{ required: "this field is required." }}
         render={({ field }) => (
           <TextField
             id="nick-name"
@@ -77,6 +88,8 @@ const BasicForm = () => {
             fullWidth
             margin="normal"
             {...field}
+            error={Boolean(errors?.nickName)}
+            helperText={errors.nickName?.message}
           />
         )}
       />
@@ -278,11 +291,12 @@ const LinaerStepper = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [skippedSteps, setSkippedSteps] = useState([]);
   const steps = getSteps();
-
   const isStepOptional = (step) => {
     return step === 1 || step === 2;
   };
-
+  const isStepFalied = () => {
+    return Boolean(Object.keys(methods.formState.errors).length);
+  };
   const isStepSkipped = (step) => {
     return skippedSteps.includes(step);
   };
@@ -334,6 +348,9 @@ const LinaerStepper = () => {
                 optional
               </Typography>
             );
+          }
+          if (isStepFalied() && activeStep == index) {
+            labelProps.error = true;
           }
           if (isStepSkipped(index)) {
             stepProps.completed = false;
